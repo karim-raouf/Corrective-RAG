@@ -1,3 +1,9 @@
-langchain 
-langchain-community 
-pypdf
+langchain==0.1.20
+langchain-community==0.0.32
+langchain-core==0.1.48
+langchain-openai==0.1.7
+langchain-chroma==0.1.4
+langchain-tavily==0.1.2
+pypdf==4.2.0
+pydantic==2.7.1
+pydantic-settings==2.2.1
