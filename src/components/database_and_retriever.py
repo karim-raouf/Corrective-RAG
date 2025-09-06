@@ -30,13 +30,20 @@ def vectorstore_processing_and_retriever() -> Chroma:
         
         with open("src/databases/bm25.pkl", "wb") as f:
             pickle.dump(bm25_retriever, f)
+<<<<<<< HEAD
+        print(f"Creating vector store...")
+=======
         
+>>>>>>> c9ad0afff5ffd4a929d3790d8f573263f0048b3b
         vector_store = Chroma.from_documents(
             documents=chunks, 
             embedding=embeddings,
             persist_directory=persist_dir
         )
+<<<<<<< HEAD
+=======
         # vector_store.persist()
+>>>>>>> c9ad0afff5ffd4a929d3790d8f573263f0048b3b
         
     with open("src/databases/bm25.pkl", "rb") as f:
         bm25_retriever = pickle.load(f)
@@ -44,9 +51,15 @@ def vectorstore_processing_and_retriever() -> Chroma:
     
     hybrid_retriever = EnsembleRetriever(
     retrievers=[dense_retriever, bm25_retriever],
+<<<<<<< HEAD
+    weights=[0.6, 0.4],  # tune weights based on testing
+    )
+    print("Hybdrid Retriever is ready.")
+=======
     weights=[0.5, 0.5],  # tune weights based on testing
     )
     
+>>>>>>> c9ad0afff5ffd4a929d3790d8f573263f0048b3b
     def limited_retriever(query):
         results = hybrid_retriever.invoke(query)
         return results[:5]   # only keep top 5 after re-ranking

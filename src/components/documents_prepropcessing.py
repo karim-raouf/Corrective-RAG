@@ -5,7 +5,11 @@ import os
 from typing import List
 
 def load_documents(directory_path: str) -> list[Document]:
+<<<<<<< HEAD
+    print(f"Loading documents...")
+=======
     
+>>>>>>> c9ad0afff5ffd4a929d3790d8f573263f0048b3b
     all_documents = []
 
     if not os.path.isdir(directory_path):
@@ -26,7 +30,12 @@ def load_documents(directory_path: str) -> list[Document]:
     return all_documents
 
 
+<<<<<<< HEAD
+def split_documents(documents: list[Document], chunk_size: int=1000, chunk_overlap: int=100) -> list[Document]:
+    print(f"Splitting documents into chunks...")
+=======
 def split_documents(documents: list[Document], chunk_size: int=500, chunk_overlap: int=50) -> list[Document]:
+>>>>>>> c9ad0afff5ffd4a929d3790d8f573263f0048b3b
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=chunk_size, 
         chunk_overlap=chunk_overlap, 

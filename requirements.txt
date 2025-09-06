@@ -6,4 +6,4 @@ langchain-chroma==0.1.4
 langchain-tavily==0.1.2
 pypdf==4.2.0
 pydantic==2.7.1
-pydantic-settings==2.2.1
+pydantic-settings==2.2.1s
