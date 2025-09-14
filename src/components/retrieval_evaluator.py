@@ -46,7 +46,7 @@ def evaluate_retrieved_docs(query: str, documents: List[Document]) -> List[str]:
     retrieval_grader = retrieval_evaluator_prompt | structured_llm_evaluator
     for doc in documents:
         result = retrieval_grader.invoke({"document": doc.page_content, "query": query})
-        print(f"Document relevance: {result.binary_score}")
+        # print(f"Document relevance: {result.binary_score}")
         scores.append(result.binary_score)
     
     return scores

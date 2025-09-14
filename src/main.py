@@ -1,11 +1,16 @@
 from CRAG_Graph import graph
+# import sys
+# import io
+
+# sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+#What are the AUTOSAR Basic Software requirements [SRS_BSW] that the ECU Manager fulfills, and which remain unfulfilled?
 
 
-<<<<<<< HEAD
-output = graph.invoke({"question": "What are the work products expected in ASPICE SYS.1?"})
+question = """is software interface testing requested in SWE. 5?
+            """
+
+#List the base practices for MAN.3 Project Management process
+output = graph.invoke({"question": question})
+print("final answer: --------------------------------------------------")
 print(output["final_output"])
- 
-=======
-output = graph.invoke({"question": "What is the difference between ASPICE SYS.2 and SWE.1 objectives?"})
-print(output["final_output"])
->>>>>>> c9ad0afff5ffd4a929d3790d8f573263f0048b3b
+

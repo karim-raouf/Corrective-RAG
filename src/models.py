@@ -1,4 +1,5 @@
 from helpers import get_setting
+from langchain_google_genai import ChatGoogleGenerativeAI
 
 from langchain_openai import AzureChatOpenAI, AzureOpenAIEmbeddings
 

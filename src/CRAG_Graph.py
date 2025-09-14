@@ -2,7 +2,7 @@ from components.web_search import tavily_search
 from typing import List,Annotated
 from typing_extensions import TypedDict
 import pickle
-from components.database_and_retriever import vectorstore_processing_and_retriever
+from components.database_and_retriever import filtered_hybrid_search
 from components.retrieval_evaluator import evaluate_retrieved_docs
 from components.documents_refinement import refine_documents
 from components.final_generation_chain import generation_chain
@@ -12,6 +12,7 @@ from langchain.schema import Document
 from operator import add
 from langgraph.types import Command
 from langgraph.graph import StateGraph, END, START
+from components.deciding_filtering import decide_filter
 
 class CRAGState(TypedDict):
     
@@ -27,19 +28,35 @@ class CRAGState(TypedDict):
 def query_decomposer(state: CRAGState) -> CRAGState:
     question = state["question"]
     decomposed_queries = decompose_query(question)
+    # print("Decomposed Queries:", decomposed_queries)
     return {"decomposed_queries": decomposed_queries}
 
 def retrieve(state: CRAGState) -> CRAGState:
     decomposed_questions = state["decomposed_queries"]
-    retriever = vectorstore_processing_and_retriever()
-    
+        
     print("Retrieving Documents...")
-    all_documents = []
-    for question in decomposed_questions:
-        result = retriever(question)
-        all_documents.extend(result)
+    seen_chunk_ids = set() 
+    unique_documents = []
     
-    return {"documents": all_documents}
+    for question in decomposed_questions:
+        decision = decide_filter(question)
+        # print("decision filter : ", decision)
+        # print(f"Filter decision: {decision}")
+        if decision.get("filter"):
+            metadata_filter = decision.get("metadata_filter", {})
+            # print(f"Applying metadata filter: {metadata_filter}")
+            result = filtered_hybrid_search(question, metadata_filter=metadata_filter, top_k=10)
+        else: 
+            result = filtered_hybrid_search(question, metadata_filter=None, top_k=10)
+        
+        for doc in result:
+            chunk_id = doc.metadata.get("chunk_id")
+            if chunk_id and chunk_id not in seen_chunk_ids:
+                seen_chunk_ids.add(chunk_id)
+                unique_documents.append(doc)
+    
+    print("docs after deduplication", len(unique_documents))
+    return {"documents": unique_documents}
 
 
 def evaluate(state: CRAGState) -> CRAGState:
@@ -78,8 +95,9 @@ def start_refine_documents(state: CRAGState) -> CRAGState:
 
 def post_evaluation(state: CRAGState) -> CRAGState:
     scores = state["scores"]
-    LOW_THRESHOLD = 6
-    HIGH_THRESHOLD = 9
+    print(scores)
+    LOW_THRESHOLD = 1
+    HIGH_THRESHOLD = 2
     # Decide if web search is needed based on scores
     if all(int(score) < LOW_THRESHOLD for score in scores):
         return Command(
@@ -101,10 +119,11 @@ def final_output(state: CRAGState) -> CRAGState:
     print("Generating Final Output...")
     question = state["question"]
     refined_documents = state["refined_documents"]
-    # print(refined_documents)
+    # for doc in refined_documents:
+    #     print(doc.page_content[:10000])
     
     generation_output = generation_chain.invoke({
-        question: question,
+        "question": question,
         "context": refined_documents
     })
 
@@ -119,7 +138,7 @@ def cite_sources_checker(state: CRAGState) -> CRAGState:
     valid_citations = check_for_sources(question, documents, generated_answer)
     
     if valid_citations == "False":
-        print("Citations are missing or invalid.Retrying again...")
+        print("Citations are missing or invalid, Retrying again...")
         improvment_question_part = (
             "\nPlease answer the question with proper citations from the provided documents only."
             "If the documents do not contain the answer,"
@@ -169,5 +188,4 @@ workflow.add_edge("Join", "Generate")
 workflow.add_edge("Generate", "Cite_checker")
 
 
-# 5. Compile the Graph
 graph = workflow.compile()

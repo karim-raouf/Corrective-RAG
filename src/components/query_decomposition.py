@@ -10,11 +10,14 @@ class QueryDecomposer(BaseModel):
     )
     
 system = """
-        You are an expert query decomposer. Your task is to break down complex questions into simpler,
-        more manageable sub-questions that can be answered individually.
-        Each sub-question should be clear, concise, and directly related to the main question.
-        
-        Question: {question}
+        You are an expert query decomposer. Your task is to break down a complex question into simpler, atomic sub-questions. 
+        Each sub-question must:
+        - Ask only one thing (no compound queries).
+        - Be clear, concise, and self-contained.
+        - Stay directly relevant to the main question.
+        - Avoid overlap with other sub-questions.
+
+        Main Question: {question}
         """
 
 def decompose_query(question: str) -> List[str]:

@@ -1,7 +1,7 @@
 from pathlib import Path
-from pydantic_settings import BaseSettings , SettingsConfigDict
+from pydantic_settings import BaseSettings
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
-
+from pydantic import BaseModel, ConfigDict
 
 class settings(BaseSettings):
     
